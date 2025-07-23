@@ -26,3 +26,9 @@ export function useAuth() {
 
   return { loading, authenticated };
 }
+
+export function logout() {
+  console.log('Cerrando sesión...');
+  localStorage.clear(); // limpiar el localstorage completo del navegador
+  window.location.href = '/signin'; // Redirige a la página de usuario
+}
