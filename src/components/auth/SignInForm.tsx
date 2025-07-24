@@ -5,6 +5,7 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
+import { signin } from "../../hooks/useAuth";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,27 +21,7 @@ export default function SignInForm() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Error desconocido");
-      }
-
-      // Guarda el token en localStorage o donde prefieras
-      localStorage.setItem("access_token", data.token);
-      localStorage.setItem("token_type", "Bearer");
-
-      // Opcional: redirigir al dashboard
-      window.location.href = "/";
-
+      signin(email, password)
     } catch (err: any) {
       setError(err.message);
     } finally {
