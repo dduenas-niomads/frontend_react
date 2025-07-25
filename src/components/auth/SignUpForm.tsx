@@ -4,10 +4,44 @@ import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUpForm() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+   const [form, setForm] = useState({
+    name: "",
+    last_name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+   try {
+      const response = await fetch("http://localhost:8080/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
+      console.log(data);
+
+      if (!response.ok) throw new Error("Error al registrar usuario");
+
+      alert("Usuario registrado");
+      navigate("/signin");
+    } catch (error) {
+      alert("Error al registrar usuario");
+    }
+  };
+  
   return (
     <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
       <div className="w-full max-w-md mx-auto mb-5 sm:pt-10">
@@ -82,7 +116,7 @@ export default function SignUpForm() {
                 </span>
               </div>
             </div>
-            <form>
+             <form onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
@@ -92,9 +126,11 @@ export default function SignUpForm() {
                     </Label>
                     <Input
                       type="text"
-                      id="fname"
-                      name="fname"
+                      id="name"
+                      name="name"
                       placeholder="Enter your first name"
+                      value={form.name}
+                      onChange={handleChange}
                     />
                   </div>
                   {/* <!-- Last Name --> */}
@@ -104,9 +140,11 @@ export default function SignUpForm() {
                     </Label>
                     <Input
                       type="text"
-                      id="lname"
-                      name="lname"
+                      id="last_name"
+                      name="last_name"
                       placeholder="Enter your last name"
+                      value={form.last_name}
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -120,6 +158,8 @@ export default function SignUpForm() {
                     id="email"
                     name="email"
                     placeholder="Enter your email"
+                    value={form.email}
+                    onChange={handleChange}
                   />
                 </div>
                 {/* <!-- Password --> */}
@@ -131,6 +171,10 @@ export default function SignUpForm() {
                     <Input
                       placeholder="Enter your password"
                       type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -170,10 +214,9 @@ export default function SignUpForm() {
                 </div>
               </div>
             </form>
-
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Already have an account? {""}
+                Already have an account?{" "}
                 <Link
                   to="/signin"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
